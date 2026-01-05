@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 async function cancelByTime(page: Page, targetTime: string) {
   await page.goto('https://booking.fudan.edu.cn/reservation/fe/');
   try {
-    await page.getByRole('button', { name: '登录' }).click({ timeout: 2000 });
+    await page.getByRole('button', { name: '登录' }).click({ timeout: 200 });
   } catch {
   }
   await page.getByRole('textbox', { name: 'username' }).click();

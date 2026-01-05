@@ -70,7 +70,7 @@ async function selectAndConfirmSlot(page1: Page, dayIndex: number, mode: SlotMod
 test('test', async ({ page }) => {
   await page.goto('https://booking.fudan.edu.cn/reservation/fe/');
   try {
-    await page.getByRole('button', { name: '登录' }).click({ timeout: 2000 });
+    await page.getByRole('button', { name: '登录' }).click({ timeout:100 });
   } catch {
   }
   await page.getByRole('textbox', { name: 'username' }).click();
@@ -82,8 +82,9 @@ test('test', async ({ page }) => {
   await page.getByText('网球', { exact: true }).click();
   await page.getByText('江湾室外体育场-网球').click();
   const page1Promise = page.waitForEvent('popup');
-  await page.getByText('去预约').nth(4).click(); // 这里是江湾室外体育场-网球的去预约按钮
-  //await page.getByText('去预约').nth(4).click(); //这里是江湾室内体育场去预约的按钮
+  // await page.getByText('去预约').nth(4).click(); // 这里是江湾室内体育场-网球的去预约按钮
+  await page.getByText('去预约').nth(3).click(); //这里是江湾室内体育场去预约的按钮
+  await page.getByRole('button', { name: '确定' }).click();
   const page1 = await page1Promise;
   const dayIndexEnv = process.env.DAY_INDEX;
   const slotModeEnv = process.env.SLOT_MODE as SlotMode | undefined;

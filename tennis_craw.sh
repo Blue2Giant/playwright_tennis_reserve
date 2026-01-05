@@ -1,4 +1,4 @@
-npx playwright test tests/test-2.spec.ts --headed #如果想要显示浏览器的话就加headed, 默认是headless
+npx playwright test tests/tennis_demo.spec.ts --headed #如果想要显示浏览器的话就加headed, 默认是headless
 python book_tennis.py 0 first    # 候选第1天，第一个时间段
 python book_tennis.py 1 medium   # 候选第2天，中间时间段
 python book_tennis.py 2 back     # 候选第3天，最后一个时间段
@@ -23,4 +23,4 @@ python list_reservations.py
 python cancel_scheduler.py 1h
 
 # 每隔 5 分钟检查一次，提前 20 秒取消：
-python cancel_scheduler_loop.py 20s 5m
+python cancel_scheduler_loop.py 20m 20m
