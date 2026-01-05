@@ -1,12 +1,7 @@
 import { test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-type ReservationInfo = {
-  index: number;
-  time: string;
-};
-
-async function collectReservations(page: Page): Promise<ReservationInfo[]> {
+async function cancelByTime(page: Page, targetTime: string) {
   await page.goto('https://booking.fudan.edu.cn/reservation/fe/');
   try {
     await page.getByRole('button', { name: '登录' }).click({ timeout: 2000 });
@@ -30,19 +25,30 @@ async function collectReservations(page: Page): Promise<ReservationInfo[]> {
   );
   const rowCount = await rows.count();
 
-  const result: ReservationInfo[] = [];
-
   for (let i = 0; i < rowCount; i++) {
     const row = rows.nth(i);
     const timeCell = row.locator('td').nth(2);
     const timeText = (await timeCell.textContent())?.trim() ?? '';
-    result.push({ index: i + 1, time: timeText });
-  }
+    if (timeText !== targetTime) continue;
 
-  return result;
+    const cancelCell = row.locator(
+      'td.n-data-table-td.n-data-table-td--fixed-right.n-data-table-td--last-col',
+    );
+    const cancelButton = cancelCell.getByRole('button', { name: '取消预约' }).first();
+    await cancelButton.click();
+    const confirmButton = page.getByRole('button', { name: '确认' }).first();
+    await confirmButton.click();
+    console.log('CANCELLED ' + timeText);
+    break;
+  }
 }
 
-test('cancel dry run list reservations', async ({ page }) => {
-  const reservations = await collectReservations(page);
-  console.log('RES_DATA ' + JSON.stringify(reservations));
+test('cancel reservation by time', async ({ page }) => {
+  const targetTime = process.env.TARGET_TIME;
+  if (!targetTime) {
+    console.log('NO_TARGET_TIME');
+    return;
+  }
+  await cancelByTime(page, targetTime);
 });
+

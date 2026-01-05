@@ -2,7 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
   await page.goto('https://booking.fudan.edu.cn/reservation/fe/');
-  await page.getByText('登录').click();
+  try {
+    await page.getByRole('button', { name: '登录' }).click({ timeout: 2000 });
+  } catch {
+  }
   await page.getByRole('textbox', { name: 'username' }).click();
   await page.getByRole('textbox', { name: 'username' }).fill('23210720184');
   await page.locator('#login-password').click();

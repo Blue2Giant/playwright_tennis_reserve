@@ -13,5 +13,14 @@ python run_concurrent.py 06:59 tests/tennis_demo_jiangwan.spec.ts
 python run_concurrent.py now tests/tennis_demo_jiangwan.spec.ts 
 
 
-# 取消预约
+# 取消预约 demo
 npx playwright test tests/cancel_dry.spec.ts --headed
+
+# python调用列出已经预定的部分
+python list_reservations.py
+
+# 取消预约 demo，提前指定的时间
+python cancel_scheduler.py 1h
+
+# 每隔 5 分钟检查一次，提前 20 秒取消：
+python cancel_scheduler_loop.py 20s 5m
