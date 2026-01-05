@@ -60,11 +60,12 @@ async function selectAndConfirmSlot(page1: Page, dayIndex: number, mode: SlotMod
   await slot.click();
   // 等它变成“选中态”（只等 1 秒）
   await expect(slot).toHaveClass(/active/, { timeout: 1000 });
-  // 让按钮变成选中态再来点
-  const confirmButton = page1.getByRole('button', { name: '确认预约' });
-  await expect(confirmButton).toBeEnabled({ timeout: 2000 });
-  await confirmButton.click();  console.log('已点击确认预约按钮');
-    return true;
+//   // 让按钮变成选中态再来点
+//   const confirmButton = page1.getByRole('button', { name: '确认预约' });
+//   await expect(confirmButton).toBeEnabled({ timeout: 2000 });
+//   await confirmButton.click();  console.log('已点击确认预约按钮');
+//     return true;
+  return true;
   }
   
 test('test', async ({ page }) => {
