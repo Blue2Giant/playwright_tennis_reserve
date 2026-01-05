@@ -10,4 +10,8 @@ python run_concurrent.py now #立刻
 
 # 真的要预约的话
 python run_concurrent.py 06:59 tests/tennis_demo_jiangwan.spec.ts
-python run_concurrent.py now tests/tennis_demo_jiangwan.spec.ts
+python run_concurrent.py now tests/tennis_demo_jiangwan.spec.ts 
+
+
+# 取消预约
+npx playwright test tests/cancel_dry.spec.ts --headed
