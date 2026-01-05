@@ -1,1 +1,1 @@
-npx playwright test tests/test-2.spec.ts --headed #如果想要显示浏览器的话就加headed
+npx playwright test tests/test-2.spec.ts --headed #如果想要显示浏览器的话就加headed, 默认是headless
