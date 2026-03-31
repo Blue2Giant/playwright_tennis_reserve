@@ -48,6 +48,8 @@ def main() -> None:
         lead_seconds = parse_lead(sys.argv[1])
 
     reservations = get_reservations()
+    print("所有预约条目:")
+    print(json.dumps(reservations, ensure_ascii=False, indent=2))
     now = datetime.now()
 
     due = []
@@ -69,4 +71,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -2,6 +2,14 @@ import { test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 async function cancelByTime(page: Page, targetTime: string) {
+  let datePart = '';
+  let timePart = '';
+  const m = targetTime.match(/(\d{4}-\d{1,2}-\d{1,2}).*?(\d{1,2}:\d{2})/);
+  if (m) {
+    datePart = m[1];
+    timePart = m[2];
+  }
+
   await page.goto('https://booking.fudan.edu.cn/reservation/fe/');
   try {
     await page.getByRole('button', { name: '登录' }).click({ timeout: 200 });
@@ -28,8 +36,19 @@ async function cancelByTime(page: Page, targetTime: string) {
   for (let i = 0; i < rowCount; i++) {
     const row = rows.nth(i);
     const timeCell = row.locator('td').nth(2);
-    const timeText = (await timeCell.textContent())?.trim() ?? '';
-    if (timeText !== targetTime) continue;
+    const divs = timeCell.locator('div');
+    const dateText = ((await divs.nth(0).textContent()) ?? '').trim();
+    const intervalText = ((await divs.nth(1).textContent()) ?? '').trim();
+    console.log('ROW_PARTS', i + 1, dateText, intervalText);
+
+    if (datePart && timePart) {
+      if (!dateText.includes(datePart)) continue;
+      if (!intervalText.includes(timePart)) continue;
+    } else {
+      const combined = ((await timeCell.textContent()) ?? '').replace(/\s/g, '');
+      const targetKey = targetTime.replace(/\s/g, '');
+      if (!combined.includes(targetKey)) continue;
+    }
 
     const cancelCell = row.locator(
       'td.n-data-table-td.n-data-table-td--fixed-right.n-data-table-td--last-col',
@@ -38,7 +57,7 @@ async function cancelByTime(page: Page, targetTime: string) {
     await cancelButton.click();
     const confirmButton = page.getByRole('button', { name: '确认' }).first();
     await confirmButton.click();
-    console.log('CANCELLED ' + timeText);
+    console.log('CANCELLED', dateText, intervalText);
     break;
   }
 }
@@ -51,4 +70,3 @@ test('cancel reservation by time', async ({ page }) => {
   }
   await cancelByTime(page, targetTime);
 });
-

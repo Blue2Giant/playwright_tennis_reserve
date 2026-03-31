@@ -84,8 +84,14 @@ test('test', async ({ page }) => {
   const page1Promise = page.waitForEvent('popup');
   // await page.getByText('去预约').nth(4).click(); // 这里是江湾室内体育场-网球的去预约按钮
   await page.getByText('去预约').nth(3).click(); //这里是江湾室内体育场去预约的按钮
-  await page.getByRole('button', { name: '确定' }).click();
+  try {
+    await page.getByRole('button', { name: '确定' }).click({ timeout:100 });
+  } catch {
+  }
   const page1 = await page1Promise;
+  await page.goto('https://booking.fudan.edu.cn/reservation/fe/site/special/special?id=48');
+  await page1.goto('https://booking.fudan.edu.cn/reservation/fe/site/reservationInfo?id=1071');
+  await page1.goto('https://booking.fudan.edu.cn/reservation/fe/site/reservationInfo?id=1071');
   const dayIndexEnv = process.env.DAY_INDEX;
   const slotModeEnv = process.env.SLOT_MODE as SlotMode | undefined;
 
