@@ -1,11 +1,13 @@
-import json
-import os
 import re
-import subprocess
-import sys
-from datetime import datetime, timedelta
+import argparse
+from datetime import datetime
 
-from list_reservations import get_reservations
+from reservation_client import (
+    cancel_reservation,
+    format_reservation_line,
+    get_reservations,
+    reservation_time_text,
+)
 
 
 def parse_lead(value: str) -> int:
@@ -32,29 +34,26 @@ def parse_start_time(text: str) -> datetime | None:
         return None
 
 
-def cancel_by_time(time_text: str) -> None:
-    env = os.environ.copy()
-    env["TARGET_TIME"] = time_text
-    subprocess.run(
-        ["npx", "playwright", "test", "tests/cancel_by_time.spec.ts"],
-        env=env,
-        check=True,
-    )
-
-
 def main() -> None:
-    lead_seconds = 60
-    if len(sys.argv) > 1:
-        lead_seconds = parse_lead(sys.argv[1])
+    parser = argparse.ArgumentParser(description="取消即将开始的预约")
+    parser.add_argument("lead", nargs="?", default="60s", help="提前量，例如 20m / 1h")
+    parser.add_argument("--headed", action="store_true", help="显示浏览器窗口")
+    args = parser.parse_args()
 
-    reservations = get_reservations()
+    lead_seconds = parse_lead(args.lead)
+
+    reservations = get_reservations(headed=args.headed)
     print("所有预约条目:")
-    print(json.dumps(reservations, ensure_ascii=False, indent=2))
+    if reservations:
+        for reservation in reservations:
+            print(format_reservation_line(reservation))
+    else:
+        print("当前没有已预约记录。")
     now = datetime.now()
 
     due = []
     for r in reservations:
-        start = parse_start_time(r["time"])
+        start = parse_start_time(reservation_time_text(r))
         if not start:
             continue
         delta = (start - now).total_seconds()
@@ -62,11 +61,17 @@ def main() -> None:
             due.append(r)
 
     print("即将开始的预约条目:")
-    print(json.dumps(due, ensure_ascii=False, indent=2))
+    if due:
+        for reservation in due:
+            print(format_reservation_line(reservation))
+    else:
+        print("当前没有命中提前量窗口的预约。")
 
     for r in due:
-        print(f"取消预约: index={r['index']} time={r['time']}")
-        cancel_by_time(r["time"])
+        print(f"取消预约: {format_reservation_line(r)}")
+        result = cancel_reservation(r, headed=args.headed)
+        if not result.get("success"):
+            raise RuntimeError(f"取消失败: {result}")
 
 
 if __name__ == "__main__":
